@@ -28,33 +28,41 @@ public:
 	}
 
 	// TODO
-	void step() {};
+	void step(Vicinity<Cell> readVicinity, Vicinity<Cell> writeVicinity) {
+		// Dead cells take no steps
+		if (contents.has_value()) {
+		}
+	}
 };
 
 class Grid {
-	Rows<Cell> contents;
+	Rows<Cell> m_readBuffer;
+	Rows<Cell> m_writeBuffer;
 
 public:
-	Grid(size_t colLen, size_t rowLen) {
-		contents = Rows<Cell>(colLen, rowLen);
-	}
+	Grid() {}
+
+	Grid(size_t colLen, size_t rowLen) : m_readBuffer(colLen, rowLen), m_writeBuffer(colLen, rowLen) {}
 
 	void fillRandom() {
-		for (size_t i = 0; i < contents.columnLength(); i++)
-			for (size_t j = 0; j < contents.rowLength(); j++) {
-				contents[i][j] = Cell();
-				contents[i][j] = Cell::random();
+		for (size_t i = 0; i < m_readBuffer.columnLength(); i++)
+			for (size_t j = 0; j < m_readBuffer.rowLength(); j++) {
+				m_readBuffer[i][j] = Cell();
+				m_readBuffer[i][j] = Cell::random();
 			}
-	};
+	}
 
-	//TODO
 	void step() {
 		while (true)
 		{
-			for (size_t i = 0; i < contents.columnLength(); i++)
-				for (size_t j = 0; j < contents.rowLength(); j++) {
+			for (size_t i = 0; i < m_readBuffer.columnLength(); i++) {
+				for (size_t j = 0; j < m_readBuffer.rowLength(); j++) {
+					Cell currCell = m_readBuffer[i][j];
+					auto readVicinity = Vicinity<Cell>(m_readBuffer, i, j);
+					auto writeVicinity = Vicinity<Cell>(m_writeBuffer, i, j);
+					currCell.step(readVicinity, writeVicinity)
 				}
 			}
 		}
-	};
+	}
 };

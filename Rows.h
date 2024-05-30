@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+#include <algorithm>
 /// A view over contents of Rows data structure. It is only a view and thus it does not own any data.
 template <typename T>
 class Row {
@@ -26,16 +27,22 @@ class Rows {
 	// One continous array of data for better caching.
 	T* m_rows = nullptr;
 
-	// Length of a column. [[1,2], [3,4], [5,6]] would have colLen of 3.
+	// Length of a single column. [[1,2], [3,4], [5,6]] would have colLen of 3.
 	size_t m_colLen = 0;
 
-	// Length of a row. [[1,2], [3,4], [5,6]] would have rowLen of 2.
+	// Length of a single row. [[1,2], [3,4], [5,6]] would have rowLen of 2.
 	size_t m_rowLen = 0;
 
 public:
 	Rows() {};
 
 	Rows(size_t colLen, size_t rowLen) {
+		m_colLen = colLen;
+		m_rowLen = rowLen;
+		m_rows = new T[colLen * rowLen];
+	}
+
+	void construct(size_t colLen, size_t rowLen) {
 		m_colLen = colLen;
 		m_rowLen = rowLen;
 		m_rows = new T[colLen * rowLen];
@@ -56,10 +63,7 @@ public:
 		return Row<T>(&m_rows[index * m_rowLen], m_rowLen);
 	}
 
-	// Visual C++ does not want me to deallocate memory so I won't. Microsoft please fix.
 	~Rows() {
-#ifndef _WIN32
 		delete[] m_rows;
-#endif
 	}
 };

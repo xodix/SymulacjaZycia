@@ -12,23 +12,23 @@
 #include "Grid.h"
 
 class Simulation {
-	Grid readGrid = Grid(N_ROWS, N_COLS);
-	Grid writeGrid = Grid(N_ROWS, N_COLS);
+	Grid readGrid;
 
 public:
-	Simulation() {
+	Simulation() : readGrid(N_ROWS, N_COLS) {
 		readGrid.fillRandom();
 	}
 
 	void run() {
-		while (true)
-			readGrid.step();
+		std::cout << "runnning the simulation right now;" << std::endl;
 	}
 };
 
 int main()
 {
 	Simulation simulation = Simulation();
+	simulation.run();
+
 	std::cout << "Fuck this!" << std::endl;
 	return 0;
 }

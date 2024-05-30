@@ -57,7 +57,4 @@ public:
 
 		return organism;
 	}
-
-	void Step(Vicinity<Cell>* x) {
-	}
 };

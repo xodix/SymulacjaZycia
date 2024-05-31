@@ -10,25 +10,22 @@ enum class OrganismType {
 
 class Organism {
 protected:
-	bool m_alive = false;
 	size_t m_age = 0;
 	OrganismType m_organismType;
 
 public:
-	Organism() {};
-	Organism::Organism(OrganismType organismType, size_t age = DEFAULT_AGE, bool alive = true) {
+	Organism::Organism(OrganismType organismType, size_t age = DEFAULT_AGE) {
 		m_organismType = organismType;
 		m_age = age;
-		m_alive = alive;
 	}
 
-	bool isAlive() {
-		return m_alive;
+	inline bool isAlive() {
+		return m_age == 0;
 	}
 
 	const char representation() {
 		if (!isAlive()) {
-			return 'X';
+			return '+';
 		}
 
 		switch (m_organismType)
@@ -50,11 +47,6 @@ public:
 		std::uniform_int_distribution<unsigned int> dist(0, 5);
 		unsigned int choice = dist(rd);
 
-		Organism organism = Organism();
-		organism.m_alive = (choice >= 3) ? false : true;
-		organism.m_age = DEFAULT_AGE;
-		organism.m_organismType = (OrganismType)(choice % 3);
-
-		return organism;
+		return Organism((OrganismType)(choice % 3), (choice >= 3) ? choice : 0);
 	}
 };

@@ -2,20 +2,6 @@
 #include "../Headers/Rows.h"
 #include "TestingUtilities.h"
 
-int test_initialize_empty() {
-	try {
-		// m_contents = nullptr colLen = rowLen = 0
-		Rows<int> rows = Rows<int>();
-
-		// This has to throw an exception.
-		rows[0][0] = 10;
-		return EXIT_FAILURE;
-	}
-	catch (const std::exception& e) {
-		return EXIT_SUCCESS;
-	}
-}
-
 int test_initialize() {
 	try {
 		// m_contents = nullptr colLen = rowLen = 0
@@ -61,7 +47,6 @@ int test_read_write() {
 }
 
 int main(int argc, const char* argv[]) {
-	test("empty_initialize", test_initialize_empty);
 	test("initialize", test_initialize);
 	test("read_write", test_read_write);
 }

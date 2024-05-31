@@ -2,9 +2,12 @@
 #include <optional>
 #include <string>
 #include <random>
+#include <chrono>
+#include <thread>
 
 #define N_COLS 3
 #define N_ROWS 5
+constexpr std::chrono::milliseconds SIMULATION_STEP_TIMEOUT(100);
 
 #include "Headers/Vicinity.h"
 #include "Headers/Rows.h"
@@ -12,15 +15,18 @@
 #include "Headers/Grid.h"
 
 class Simulation {
-	Grid readGrid;
+	Grid grid;
 
 public:
-	Simulation() : readGrid(N_ROWS, N_COLS) {
-		readGrid.fillRandom();
+	Simulation() : grid(N_ROWS, N_COLS) {
+		grid.fillRandom();
 	}
 
 	void run() {
-		std::cout << "runnning the simulation right now;" << std::endl;
+		while (true) {
+			grid.step();
+			std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
+ }
 	}
 };
 

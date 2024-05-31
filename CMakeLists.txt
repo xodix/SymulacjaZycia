@@ -1,22 +1,28 @@
-﻿# CMakeList.txt : CMake project for SymulacjaZycia, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
 project("SymulacjaZycia")
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Add source to this project's executable.
+# Make project compile with optimizations on both Windows and Linux.
+if(MSVC)
+    add_compile_options("/W4" "$<$<CONFIG:RELEASE>:/O2>")
+else()
+    add_compile_options("-Wall" "-Wextra" "-Werror" "$<$<CONFIG:RELEASE>:-O3>")
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        add_compile_options("-stdlib=libc++")
+    endif()
+endif()
+
+# MAIN EXECUTABLE
 add_executable(SymulacjaZycia "SymulacjaZycia.cpp" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Headers/Vicinity.h")
 
-
-# TODO: Add tests and install targets if needed.
+# TESTS
 add_executable(TestRows "Tests/TestRows.cpp" "Headers/Rows.h" "Tests/TestingUtilities.h")
 
 enable_testing()
 
 add_test(
-	NAME TestRows
-	COMMAND $<TARGET_FILE:TestRows>
+    NAME TestRows
+    COMMAND $<TARGET_FILE:TestRows>
 )

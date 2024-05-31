@@ -40,7 +40,6 @@ class Grid {
 	Rows<Cell> m_writeBuffer;
 
 public:
-	Grid() {}
 
 	Grid(size_t colLen, size_t rowLen) : m_readBuffer(colLen, rowLen), m_writeBuffer(colLen, rowLen) {}
 

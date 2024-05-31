@@ -1,6 +1,7 @@
 #pragma once
 #include <stdexcept>
 #include <algorithm>
+
 /// A view over contents of Rows data structure. It is only a view and thus it does not own any data.
 template <typename T>
 class Row {
@@ -34,8 +35,6 @@ class Rows {
 	size_t m_rowLen = 0;
 
 public:
-	Rows() {};
-
 	Rows(size_t colLen, size_t rowLen) {
 		if (colLen == 0 || rowLen == 0)
 			throw std::length_error("Cannot initialize Rows<T> with the col or row length of 0.");

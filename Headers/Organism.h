@@ -9,9 +9,8 @@ enum class OrganismType {
 };
 
 class Organism {
-protected:
 	size_t m_age = 0;
-	OrganismType m_organismType;
+	OrganismType m_organismType = OrganismType::Alge;
 
 public:
 	Organism::Organism(OrganismType organismType, size_t age = DEFAULT_AGE) {
@@ -19,27 +18,14 @@ public:
 		m_age = age;
 	}
 
-	inline bool isAlive() {
-		return m_age == 0;
+	inline bool isAlive() const {
+		return m_age != 0;
 	}
 
-	const char representation() {
-		if (!isAlive()) {
-			return '+';
-		}
-
-		switch (m_organismType)
-		{
-		case OrganismType::Alge:
-			return '*';
-		case OrganismType::Fungus:
-			return '#';
-		case OrganismType::Bacteria:
-			return '@';
-		default:
-			// unrechable
-			throw;
-		}
+	// Age organism by one step
+	void age() {
+		if (isAlive())
+			m_age--;
 	}
 
 	static Organism random() {
@@ -49,4 +35,30 @@ public:
 
 		return Organism((OrganismType)(choice % 3), (choice >= 3) ? choice : 0);
 	}
+
+	friend std::ostream& operator<<(std::ostream& os, const Organism& organism);
 };
+
+std::ostream& operator<<(std::ostream& os, const Organism& organism)
+{
+	char representation = ' ';
+
+	if (!organism.isAlive())
+		representation = '+';
+
+	switch (organism.m_organismType)
+	{
+	case OrganismType::Alge:
+		representation = '*';
+	case OrganismType::Fungus:
+		representation =  '#';
+	case OrganismType::Bacteria:
+		representation = '@';
+	default:
+		// unrechable
+		throw;
+	}
+
+	os << representation;
+	return os;
+}

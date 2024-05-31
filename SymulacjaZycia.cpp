@@ -25,8 +25,9 @@ public:
 	void run() {
 		while (true) {
 			grid.step();
+			std::cout << grid;
 			std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
- }
+		}
 	}
 };
 

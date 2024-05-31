@@ -31,9 +31,25 @@ public:
 	void step(Vicinity<Cell> readVicinity, Vicinity<Cell> writeVicinity) {
 		// Dead cells take no steps
 		if (contents.has_value()) {
+
+			contents->age();
 		}
 	}
+
+	friend std::ostream& operator<<(std::ostream& os, const Cell& cell);
 };
+
+std::ostream& operator<<(std::ostream& os, const Cell& cell) {
+	if (cell.contents.has_value()) {
+		os << cell.contents.value();
+	}
+	else {
+		os << '_';
+	}
+
+	return os;
+}
+
 
 class Grid {
 	Rows<Cell> m_readBuffer;
@@ -52,16 +68,26 @@ public:
 	}
 
 	void step() {
-		while (true)
-		{
-			for (size_t i = 0; i < m_readBuffer.columnLength(); i++) {
-				for (size_t j = 0; j < m_readBuffer.rowLength(); j++) {
-					Cell currCell = m_readBuffer[i][j];
-					auto readVicinity = Vicinity<Cell>(m_readBuffer, i, j);
-					auto writeVicinity = Vicinity<Cell>(m_writeBuffer, i, j);
-					currCell.step(readVicinity, writeVicinity);
-				}
+		for (size_t i = 0; i < m_readBuffer.columnLength(); i++) {
+			for (size_t j = 0; j < m_readBuffer.rowLength(); j++) {
+				Cell currCell = m_readBuffer[i][j];
+				auto readVicinity = Vicinity<Cell>(m_readBuffer, i, j);
+				auto writeVicinity = Vicinity<Cell>(m_writeBuffer, i, j);
+				currCell.step(readVicinity, writeVicinity);
 			}
 		}
 	}
+
+	friend std::ostream& operator<<(std::ostream& os, Grid& grid);
 };
+
+std::ostream& operator<<(std::ostream& os, Grid& grid) {
+	for (size_t i = 0; i < grid.m_readBuffer.columnLength(); i++) {
+		for (size_t j = 0; j < grid.m_readBuffer.rowLength(); j++) {
+			os << grid.m_readBuffer[i][j];
+		}
+		os << '\n';
+	}
+
+	return os;
+}

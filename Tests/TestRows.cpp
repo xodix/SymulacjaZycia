@@ -22,7 +22,6 @@ int test_initialize() {
 
 int test_read_write() {
 	try {
-		// m_contents = nullptr colLen = rowLen = 0
 		Rows<int> rows = Rows<int>(2,2);
 
 		// This has to throw an exception.
@@ -46,7 +45,23 @@ int test_read_write() {
 	}
 }
 
+int test_invalid_access() {
+	// This should fail
+	try {
+		Rows<int> rows = Rows<int>(2,2);
+
+		// 3 is out of range of the 2x2 matrix. So it should throw std::range_error here
+		rows[0][3] = 0;
+
+		return EXIT_FAILURE;
+	} catch (const std::exception& e) {
+		return EXIT_SUCCESS;
+	}
+
+}
+
 int main(int argc, const char* argv[]) {
 	test("initialize", test_initialize);
-	test("read_write", test_read_write);
+	test("out of range access", test_invalid_access);
+	test("read & write", test_read_write);
 }

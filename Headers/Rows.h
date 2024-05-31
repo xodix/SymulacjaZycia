@@ -37,12 +37,8 @@ public:
 	Rows() {};
 
 	Rows(size_t colLen, size_t rowLen) {
-		m_colLen = colLen;
-		m_rowLen = rowLen;
-		m_rows = new T[colLen * rowLen];
-	}
-
-	void construct(size_t colLen, size_t rowLen) {
+		if (colLen == 0 || rowLen == 0)
+			throw std::length_error("Cannot initialize Rows<T> with the col or row length of 0.");
 		m_colLen = colLen;
 		m_rowLen = rowLen;
 		m_rows = new T[colLen * rowLen];

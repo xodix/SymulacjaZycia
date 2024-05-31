@@ -6,10 +6,10 @@
 #define N_COLS 3
 #define N_ROWS 5
 
-#include "Vicinity.h"
-#include "Rows.h"
-#include "Organism.h"
-#include "Grid.h"
+#include "Headers/Vicinity.h"
+#include "Headers/Rows.h"
+#include "Headers/Organism.h"
+#include "Headers/Grid.h"
 
 class Simulation {
 	Grid readGrid;

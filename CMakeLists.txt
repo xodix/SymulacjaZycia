@@ -20,9 +20,17 @@ add_executable(SymulacjaZycia "SymulacjaZycia.cpp" "Headers/Rows.h" "Headers/Org
 # TESTS
 add_executable(TestRows "Tests/TestRows.cpp" "Headers/Rows.h" "Tests/TestingUtilities.h")
 
+
+add_executable(TestReadWrite "Tests/TestReadWrite.cpp" "Headers/Vicinity.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Tests/TestingUtilities.h")
+
 enable_testing()
 
 add_test(
     NAME TestRows
     COMMAND $<TARGET_FILE:TestRows>
+)
+
+add_test(
+    NAME TestReadWrite
+    COMMAND $<TARGET_FILE:TestReadWrite>
 )

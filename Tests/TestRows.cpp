@@ -7,9 +7,9 @@ int test_initialize() {
 		// m_contents = nullptr colLen = rowLen = 0
 		Rows<int> rows = Rows<int>(1,2);
 		
-		if (rows.columnLength() != 1)
+		if (rows.ColumnLength() != 1)
 			return EXIT_FAILURE;
-		if (rows.rowLength() != 2)
+		if (rows.RowLength() != 2)
 			return EXIT_FAILURE;
 
 		return EXIT_SUCCESS;

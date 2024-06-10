@@ -1,4 +1,4 @@
-# Symulacja ¯ycia
+# Symulacja Å»ycia
 
 ## Budowa projektu
 
@@ -10,7 +10,7 @@
 	make
 ```
 
-## Wykonywanie testów (po budowie)
+## Wykonywanie testÃ³w (po budowie)
 
 ```sh
 	ctest
@@ -18,13 +18,13 @@
 
 ## Uruchomianie Projektu
 
-### Losowe roz³o¿enie ekosystemu
+### Losowe rozÅ‚oÅ¼enie ekosystemu
 
 ```sh
 	./SymulacjaZycia
 ```
 
-### Roz³o¿enie ekosystemu pobrane z "plik.txt"
+### RozÅ‚oÅ¼enie ekosystemu pobrane z "plik.txt"
 
 ```sh
 	./SymulacjaZycia plik.txt
@@ -33,70 +33,90 @@
 ## Struktury danych
 
 ### Rows<T> - tablica dwuwymiarowa
+
 #### plik: Rows.h
+
 #### wymagania: Row<T>
 
-W³asna implementacja tablicy "dwuwymiarowej".
+WÅ‚asna implementacja tablicy "dwuwymiarowej".
 
 Rows<T> przechowuje dane w tablicy jednowymiarowej
-i eksponuje funkcje i przeci¹¿enia operatorów, które pomagaj¹ urzytkownikowi traktowaæ
-t¹ klasê jake tablicê dwuwymiarow¹ zachowuj¹æ cache locality.
+i eksponuje funkcje i przeciÄ…Å¼enia operatorÃ³w, ktÃ³re pomagajÄ… uÅ¼ytkownikowi traktowaÄ‡
+tÄ… klasÄ™ jake tablicÄ™ dwuwymiarowÄ… zachowujÄ…c cache locality.
 
-Aby uzyskaæ jeden rz¹d tablicy "dwuwymiarowej" nale¿y ponownie urzyæ operatora[].
+Aby uzyskaÄ‡ jeden rzÄ…d tablicy "dwuwymiarowej" naleÅ¼y ponownie uÅ¼yÄ‡ operatora[].
 
-### Row<T> - jeden rz¹d w tablicy dwuwymiarowej
+### Row<T> - jeden rzÄ…d w tablicy dwuwymiarowej
+
 #### plik: Rows.h
 
-Rz¹d uzyskuje siê po urzyciu operatora[] na klasie `Rows<T>`.
-Klasa ta eksponuje wycinek jednowymiarowej tablicy (rz¹d), który ma wielkoœæ RowLen.
+RzÄ…d uzyskuje siÄ™ po uÅ¼yciu operatora[] na klasie `Rows<T>`.
+Klasa ta eksponuje wycinek jednowymiarowej tablicy (rzÄ…d), ktÃ³ry ma wielkoÅ›Ä‡ RowLen.
 
-Aby uzyskaæ wartoœæ `T` nale¿y ponownie urzyæ operatora[]
+Aby uzyskaÄ‡ wartoÅ›Ä‡ `T` naleÅ¼y ponownie uÅ¼yÄ‡ operatora[]
 
-### Vicinity<T> - S¹siedztwo
+### Vicinity<T> - SÄ…siedztwo
+
 #### plik: Vicinity.h
+
 #### wymagania: Rows<T>
 
-S¹siedztwo pobiera po³o¿enie niszy otaczaj¹ce wskazan¹ niszê.
+SÄ…siedztwo pobiera poÅ‚oÅ¼enie niszy otaczajÄ…ce wskazanÄ… niszÄ™.
 
-Klasa zwraca szczególn¹ uwagê aby nie pobraæ informacji nie nale¿¹cej do
+Klasa zwraca szczegÃ³lnÄ… uwagÄ™ aby nie pobraÄ‡ informacji nie naleÅ¼Ä…cej do
 instancji `Rows<T>`.
 
-Próba dostêpu do pozycji spoza Rows<T> skutkuje w `std::rangeError`.
-Algorytm tworzenie s¹siedztwa jest zbytecznie skomplikowany, ale nie mog³em wymyœleæ lepszego.
+PrÃ³ba dostÄ™pu do pozycji spoza Rows<T> skutkuje w `std::rangeError`.
+Algorytm tworzenie sÄ…siedztwa jest zbytecznie skomplikowany, ale nie mogÅ‚em wymyÅ›liÄ‡ lepszego.
 
 ### std::optional<T>
+
 #### plik: <optional>
 
-Klasa optional mo¿e zawieraæ T lub std::nullopt.
-U¿ywana jest w `Cell` poniewa¿ jej konstrukcja nie wymaga kolejnej alokacji na stercie.
+Klasa optional moÅ¼e zawieraÄ‡ T lub std::nullopt.
+UÅ¼ywana jest w `Cell` poniewaÅ¼ jej konstrukcja nie wymaga kolejnej alokacji na stercie.
 
 ## Klasy
 
+### RandomGenerator - Generator liczb pseudolosowych
+
+#### plik: RandomGenerator.h
+
+Generator to klasa singelton, ktÃ³ra posiada tylko i wyÅ‚Ä…cznie jednÄ… instancjÄ™
+klasy std::random_device jako parametr. `RandomGenerator` eksponuje funkcje zwiÄ…zane z
+generacjÄ… funkcji losowych.
+
 ### Simulation - Symulacja
+
 #### plik: SymulacjaZycia.cpp
+
 #### wymagania: Grid
 
-Symulacja zawiera `Grid` i zarz¹dza dzia³aniem symulacji.
-Szczególnie rozpoczêciem i zakoñczeniem symulacji.
+Symulacja zawiera `Grid` i zarzÄ…dza dziaÅ‚aniem symulacji.
+SzczegÃ³lnie rozpoczÄ™ciem i zakoÅ„czeniem symulacji.
 
 ### Grid - Siatka
+
 #### plik: Grid.h
+
 #### wymagania: Rows<T>, Cell
 
-Siatka zawiera tablicê dwuwymiarowa `Rows`, która zawiera instacje `Cell`.
+Siatka zawiera tablicÄ™ dwuwymiarowa `Rows`, ktÃ³ra zawiera instancje `Cell`.
 Siatka przekazuje do `Cell` jej `Vicinity`.
 
 ### Cell - Nisza
+
 #### plik: Grid.h
-#### wymagania: Organism, std::optional 
+
+#### wymagania: Organism, std::optional
 
 Nisza zawiera `Organism` lub nic(std::nullopt_t).
-Nisza jest g³ówn¹ klas¹ która w pe³ni zarz¹dza `Organism`.
+Nisza jest gÅ‚Ã³wnÄ… klasÄ… ktÃ³ra w peÅ‚ni zarzÄ…dza `Organism`.
 Na podstawie podanego `Vicinity` `Cell` wykonuje krok symulacji.
 
 ### Organism - Organizm
+
 #### plik: Organism.h
 
-Organizm to klasa, która zawiera dane organizmu
-i eksponuje je w sposób przystosowany do dzia³ania Symulacji.
-
+Organizm to klasa, ktÃ³ra zawiera dane organizmu
+i eksponuje je w sposÃ³b przystosowany do dziaÅ‚ania Symulacji.

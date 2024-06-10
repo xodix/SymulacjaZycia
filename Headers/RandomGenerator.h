@@ -1,40 +1,62 @@
 #pragma once
+#include <random>
 
 // Singleton for pseudorandom number generation.
-class RandomGenerator{
-	std::random_device* rd;
+class RandomGenerator
+{
+	std::random_device *m_rd = nullptr;
+	static RandomGenerator *s_instance;
+
+	// Create the instance of std::random_device that will last till program completion.
+	RandomGenerator()
+	{
+		m_rd = new std::random_device();
+	}
 
 public:
-
-	RandomGenerator() {
-		// Initializing static variable only once.
-		if (RandomGenerator::rd == nullptr) {
-			RandomGenerator::rd = new std::random_device();
+	// Get the instance of the singleton.
+	static RandomGenerator *GetGenerator()
+	{
+		if (RandomGenerator::s_instance == nullptr)
+		{
+			RandomGenerator::s_instance = new RandomGenerator();
+			return RandomGenerator::s_instance;
+		}
+		else
+		{
+			return RandomGenerator::s_instance;
 		}
 	}
 
-	int generateRange(int from, int to) {
+	// Generate a random integer in <from, to> range.
+	int GenerateRange(int from, int to) const
+	{
 		if (from == to)
 			return from;
 
 		std::uniform_int_distribution<int> dist(from, to);
 
-		return dist(*rd);
+		return dist(*m_rd);
 	}
 
-	bool generateBoolean() {
+	// Generate a random boolean.
+	bool GenerateBoolean() const
+	{
 		std::uniform_int_distribution<short> dist(0, 1);
 
-		return dist(*rd) == 0;
+		return dist(*m_rd) == 0;
 	}
 
-	bool generateWeightedBoolean(size_t trueWeight, size_t falseWeight) {
+	// Generate a random boolean that has a different chance of beeing true than false.
+	bool GenerateWeightedBoolean(size_t trueWeight, size_t falseWeight) const
+	{
 		if (trueWeight == falseWeight)
-			return generateBoolean();
+			return GenerateBoolean();
 
 		std::uniform_int_distribution<int> dist(1, trueWeight + falseWeight);
-		size_t weightedResult = (size_t)dist(*rd);
+		size_t weightedResult = (size_t)dist(*m_rd);
 		return weightedResult <= trueWeight;
 	}
 };
 
+RandomGenerator *RandomGenerator::s_instance = nullptr;

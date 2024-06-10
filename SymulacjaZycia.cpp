@@ -1,15 +1,17 @@
 ﻿#include <iostream>
 #include <optional>
 #include <string>
-#include <random>
 #include <chrono>
 #include <thread>
+#include <filesystem>
 #include <fstream>
+#include <random>
 
-#define N_COLS 3
-#define N_ROWS 5
-constexpr std::chrono::milliseconds SIMULATION_STEP_TIMEOUT(100);
+#define N_COLS 30
+#define N_ROWS 30
+constexpr std::chrono::milliseconds SIMULATION_STEP_TIMEOUT(1000);
 
+#include "Headers/RandomGenerator.h"
 #include "Headers/Vicinity.h"
 #include "Headers/Rows.h"
 #include "Headers/Organism.h"
@@ -17,12 +19,12 @@ constexpr std::chrono::milliseconds SIMULATION_STEP_TIMEOUT(100);
 
 class Simulation {
 	Grid grid;
-	std::string filePath;
+	std::filesystem::path filePath;
 	size_t currStep = 0;
 
 public:
 	Simulation(std::string filePath) : grid(N_ROWS, N_COLS), filePath(filePath) {
-		if (filePath.empty()) {
+		if (!filePath.empty()) {
 			std::ifstream file(filePath);
 			if (!file.is_open()) {
 				throw std::runtime_error("Grid file not found!");
@@ -39,7 +41,6 @@ public:
 	void run() {
 		while (true) {
 			currStep++;
-			grid.step();
 
 #if _WIN32
 			system("cls");
@@ -57,6 +58,7 @@ public:
 			std::cout << "Bakterie @ : " << stats.nBacteria << '\n';
 			std::cout << "Martwe   + : " << stats.nDead << '\n';
 
+			grid.step();
 			std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
 		}
 	}
@@ -64,9 +66,9 @@ public:
 
 int main(int argc, const char *argv[])
 {
-	Simulation simulation = Simulation((argc > 1) ? argv[1] : "");
+	Simulation simulation = Simulation((argc > 1) ? argv[1] : std::string());
 	simulation.run();
+	std::cout << "Symulacja się zakończyła ponieważ nie ma w niej żywych organizmów.\n";
 
-	std::cout << "Fuck this!" << std::endl;
 	return 0;
 }

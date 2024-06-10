@@ -8,11 +8,6 @@ class Vicinity {
 	T* m_contents[8];
 	size_t m_length = 0;
 
-	/*
-		TODO:
-		This system is overly complicated! Yet I cannot find any other way of ensuring we do not touch data not owned by the grid.
-	*/
-
 	inline bool isTopRow(size_t i, size_t j) {
 		return i == 0;
 	}
@@ -55,5 +50,16 @@ public:
 			addRow(cells, i-1, i, j);
 			addRow(cells, i+1, i, j);
 		}
+	}
+
+	size_t length() const {
+		return m_length;
+	}
+
+	T* operator[](size_t index) {
+		if (index > m_length)
+			throw std::range_error("Index out of bounds");
+
+		return m_contents[index];
 	}
 };

@@ -15,13 +15,15 @@ else()
 endif()
 
 # MAIN EXECUTABLE
-add_executable(SymulacjaZycia "SymulacjaZycia.cpp" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Headers/Vicinity.h")
+add_executable(SymulacjaZycia "SymulacjaZycia.cpp" "Headers/RandomGenerator.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Headers/Vicinity.h" "Headers/RandomGenerator.h")
 
 # TESTS
-add_executable(TestRows "Tests/TestRows.cpp" "Headers/Rows.h" "Tests/TestingUtilities.h")
+add_executable(TestRows "Tests/TestRows.cpp" "Headers/RandomGenerator.h" "Headers/Rows.h" "Tests/TestingUtilities.h")
 
 
-add_executable(TestReadWrite "Tests/TestReadWrite.cpp" "Headers/Vicinity.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Tests/TestingUtilities.h")
+add_executable(TestReadWrite "Tests/TestReadWrite.cpp" "Headers/RandomGenerator.h" "Headers/Vicinity.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Tests/TestingUtilities.h")
+
+add_executable(TestOrganismStatistics "Tests/TestOrganismStatistics.cpp" "Headers/RandomGenerator.h" "Headers/Vicinity.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Tests/TestingUtilities.h")
 
 enable_testing()
 
@@ -34,3 +36,9 @@ add_test(
     NAME TestReadWrite
     COMMAND $<TARGET_FILE:TestReadWrite>
 )
+
+add_test(
+    NAME TestOrganismStatistics
+    COMMAND $<TARGET_FILE:TestOrganismStatistics>
+)
+

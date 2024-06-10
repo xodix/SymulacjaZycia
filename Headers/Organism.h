@@ -6,6 +6,23 @@
 #define ORGANISM_FUNGUS '#'
 #define ORGANISM_BACTERIA '@'
 
+#define ALGE_MIN_LIVE_SPAN 5
+#define ALGE_MAX_LIVE_SPAN 10
+#define ALGE_REPRODUCTION_COST 2
+#define ALGE_MEAL_LIMIT 6
+
+
+#define FUNGUS_MIN_LIVE_SPAN 40
+#define FUNGUS_MAX_LIVE_SPAN  60
+#define FUNGUS_REPRODUCTION_COST 3
+#define FUNGUS_MEAL_LIMIT 30
+
+
+#define BACTERIA_MIN_LIVE_SPAN 25
+#define BACTERIA_MAX_LIVE_SPAN  40
+#define BACTERIA_REPRODUCTION_COST 3
+#define BACTERIA_MEAL_LIMIT 10
+
 enum class OrganismType {
     Alge,
     Fungus,
@@ -14,7 +31,8 @@ enum class OrganismType {
 
 class Organism {
     size_t m_age = DEFAULT_AGE;
-    size_t n_meals = 0;
+    size_t m_nMeals = 0;
+    bool m_isHungry = true;
     OrganismType m_organismType = OrganismType::Alge;
 
 public:
@@ -27,7 +45,6 @@ public:
         return m_age != 0;
     }
 
-    // TODO: age beeing a verb and a noun may be confusing.
     // Age organism by one step
     void age() {
         if (isAlive())
@@ -35,20 +52,28 @@ public:
     }
 
     void increaseMelas() {
-        n_meals++;
+        m_nMeals++;
+
+        if (m_nMeals > getMealLimit()) {
+            m_isHungry = false;
+        }
     }
 
-    bool isFed() {
+    bool isFed() const {
+        return !m_isHungry;
+    }
+
+    size_t getMealLimit() const {
         switch (m_organismType)
         {
         case OrganismType::Alge:
-            return n_meals > 10;
+            return ALGE_MEAL_LIMIT;
             break;
         case OrganismType::Fungus:
-            return n_meals > 10;
+            return FUNGUS_MEAL_LIMIT;
             break;
         case OrganismType::Bacteria:
-            return n_meals > 10;
+            return BACTERIA_MEAL_LIMIT;
             break;
         default:
             throw;
@@ -56,20 +81,94 @@ public:
         }
     }
 
-    size_t getAge() {
+    size_t getAge() const {
         return m_age;
     }
 
-    OrganismType getOrganismType() {
+    OrganismType getType() const {
         return m_organismType;
     }
 
-    static Organism random() {
-        static std::random_device rd;
-        std::uniform_int_distribution<unsigned int> dist(0, 5);
-        unsigned int choice = dist(rd);
+    bool canReproduce() {
+        switch (m_organismType)
+        {
+        case OrganismType::Alge:
+            return m_nMeals >= ALGE_REPRODUCTION_COST;
+        case OrganismType::Fungus:
+            return m_nMeals >= FUNGUS_REPRODUCTION_COST;
+        case OrganismType::Bacteria:
+            return m_nMeals >= BACTERIA_REPRODUCTION_COST;
+        default:
+            throw;
+            break;
+        }
+    }
 
-        return Organism((OrganismType)(choice % 3), (choice >= 3) ? choice * 2 : 0);
+    void reproduce() {
+        switch (m_organismType)
+        {
+        case OrganismType::Alge:
+            m_nMeals -= ALGE_REPRODUCTION_COST;
+            break;
+        case OrganismType::Fungus:
+            m_nMeals -= FUNGUS_REPRODUCTION_COST;
+            break;
+        case OrganismType::Bacteria:
+            m_nMeals -= BACTERIA_REPRODUCTION_COST;
+            break;
+        default:
+            throw;
+            break;
+        }
+    }
+
+    static size_t getMinAge(OrganismType organismType) {
+        switch (organismType)
+        {
+        case OrganismType::Alge:
+            return ALGE_MIN_LIVE_SPAN;
+            break;
+        case OrganismType::Fungus:
+            return FUNGUS_MIN_LIVE_SPAN;
+            break;
+        case OrganismType::Bacteria:
+            return BACTERIA_MIN_LIVE_SPAN;
+            break;
+        default:
+            throw;
+            break;
+        }
+    }
+
+    static size_t getMaxAge(OrganismType organismType) {
+        switch (organismType)
+        {
+        case OrganismType::Alge:
+            return ALGE_MAX_LIVE_SPAN;
+            break;
+        case OrganismType::Fungus:
+            return FUNGUS_MAX_LIVE_SPAN;
+            break;
+        case OrganismType::Bacteria:
+            return BACTERIA_MAX_LIVE_SPAN;
+            break;
+        default:
+            throw;
+            break;
+        }
+    }
+
+    static Organism random() {
+        RandomGenerator generator = RandomGenerator();
+        bool isDead = generator.generateBoolean();
+        OrganismType organismType = (OrganismType)generator.generateRange(0, 2);
+        size_t age = 0;
+
+        if (!isDead) {
+           age = generator.generateRange(Organism::getMinAge(organismType), Organism::getMaxAge(organismType));
+        }
+
+        return Organism(organismType, age);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Organism& organism);

@@ -23,11 +23,12 @@ protected:
 	std::filesystem::path m_filePath;
 	size_t m_currStep = 0;
 
-	inline void clearScreen() {
+	inline void clearScreen()
+	{
 #if _WIN32
-			system("cls");
+		system("cls");
 #else
-			system("clear");
+		system("clear");
 #endif
 	}
 

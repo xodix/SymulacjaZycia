@@ -3,16 +3,16 @@
 ## Budowa projektu
 
 ```sh
-	mkdir symulacjazycia
-	cd symulacjazycia
-	cmake -DCMAKE_BUILD_TYPE=Release ..
-	cmake --build .
+mkdir symulacjazycia
+cd symulacjazycia
+cmake ..
+cmake --build . --config Release
 ```
 
 ## Wykonywanie testów (po budowie)
 
 ```sh
-	ctest
+ctest -C Release
 ```
 
 ## Uruchomianie Projektu
@@ -20,13 +20,13 @@
 ### Losowe rozłożenie ekosystemu
 
 ```sh
-	./SymulacjaZycia
+./SymulacjaZycia
 ```
 
 ### Rozłożenie ekosystemu pobrane z "plik.txt"
 
 ```sh
-	./SymulacjaZycia plik.txt
+./SymulacjaZycia plik.txt
 ```
 
 ## Struktury danych

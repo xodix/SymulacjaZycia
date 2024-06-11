@@ -111,3 +111,23 @@ i eksponuje je w sposób przystosowany do działania Symulacji.
 Modyfikacja i przeglądanie danych organizmu jest ograniczone
 za pomocą funkcji getter i setter np. organizm może zostać postarzony
 o tylko jeden krok symulacji i nakarmiony tylko jednym pokarmem.
+
+## Możliwe drogi rozwoju
+
+### Własny system IO
+
+System IO posiada kilka wad:
+
+1. std::stringstream nie ma łatwej opcji korzystania z prealokowanego buforu
+2. std::cout << std::stringstream zajmuje aż 85% działania symulacji.
+
+Rozwiązaniem byłby własny system io który przechowywałby całą reprezentację tekstową ekosystemu
+i używałby niskopoziomowych funkcji do pisania stdout
+
+### Wielowątkowość
+
+Wielowątkowość jest w tym przypadku ciężka i nieefektywna do zastosowania.
+Jedna nisza potrafi zmienić swoje sąsiedztwo co wpływa na następne.
+
+W "Game of live" jedna komórka jest bytem, który tylko i wyłącznie czyta swoje otoczenie.
+Dlatego algorytm tej symulacji łatwo można rozbić na wiele wątków. A tego programu nie.

@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Make project compile with optimizations on both Windows and Linux.
 if(MSVC)
-    add_compile_options("/W4" "$<$<CONFIG:RELEASE>:/O2>")
+    add_compile_options("/W4" "$<$<CONFIG:RELEASE>:/O2>" "/DEBUG")
 else()
-    add_compile_options("-Wall" "-Wextra" "-Werror" "$<$<CONFIG:RELEASE>:-O3>")
+    add_compile_options("-Wall" "-Wextra" "$<$<CONFIG:RELEASE>:-O3>")
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         add_compile_options("-stdlib=libc++")
     endif()

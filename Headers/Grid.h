@@ -59,6 +59,11 @@ class Cell
                     cells[7 - nBacteria] = vicinity[i];
                     nBacteria++;
                     break;
+                case OrganismType::Fungus:
+                    break;
+                default:
+                    throw;
+                    break;
                 }
             }
         }
@@ -191,7 +196,6 @@ std::istream &operator>>(std::istream &stream, Cell &cell)
     }
     else
     {
-        RandomGenerator *generator = RandomGenerator::GetGenerator();
         switch (cellRepresentation)
         {
         case ORGANISM_DEAD:

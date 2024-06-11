@@ -4,6 +4,7 @@
 #include <thread>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 
 #define N_COLS 30
 #define N_ROWS 30
@@ -18,65 +19,72 @@ constexpr std::chrono::milliseconds SIMULATION_STEP_TIMEOUT(1000);
 class Simulation
 {
 protected:
-    Grid m_grid;
-    std::filesystem::path m_filePath;
-    size_t m_currStep = 0;
+	Grid m_grid;
+	std::filesystem::path m_filePath;
+	size_t m_currStep = 0;
+
+	size_t paddingSize(size_t numberShowed, size_t messageLength)
+	{
+		int padding = N_COLS - log10(numberShowed) - messageLength;
+		return (size_t)(padding > 0 ? padding : 0);
+	}
 
 public:
-    Simulation(std::string filePath) : m_grid(N_ROWS, N_COLS), m_filePath(filePath)
-    {
-        if (!filePath.empty())
-        {
-            std::ifstream file(filePath);
-            if (!file.is_open())
-                throw std::runtime_error("Nie można otworzyć pliku z konfiguracją początkową!");
+	Simulation(std::string filePath) : m_grid(N_ROWS, N_COLS), m_filePath(filePath)
+	{
+		if (!filePath.empty())
+		{
+			std::ifstream file(filePath);
+			if (!file.is_open())
+				throw std::runtime_error("Nie można otworzyć pliku z konfiguracją początkową!");
 
-            m_grid.FillFile(file);
-        }
-        else
-        {
-            m_grid.FillRandom();
-        }
-    }
+			m_grid.FillFile(file);
+		}
+		else
+		{
+			m_grid.FillRandom();
+		}
+	}
 
-    // TODO: replace this with writing into raw terminal context
-    void Run()
-    {
-        while (true)
-        {
-            m_currStep++;
+	void Run()
+	{
+		while (true)
+		{
+			std::stringstream writeBuffer;
+			m_currStep++;
 
-#if _WIN32
-            system("cls");
-#else
-            system("clear");
-#endif
+			// Write over last buffer (ASCII escape codes)
+			// Super fast but breaks when terminal window is not sized correctly
+			writeBuffer << (char)27 << "[H";
 
-            std::cout << "Krok symulacji: " << m_currStep << '\n';
-            std::cout << m_grid;
+			// Almost fixes the problem
+			writeBuffer << "Krok symulacji: " << m_currStep << std::string(paddingSize(m_currStep, 17), ' ') << '\n';
+			writeBuffer << m_grid;
 
-            OrganismsStatistics stats = m_grid.GetOrganismsStatistics();
-            std::cout << "Glony    * : " << stats.nAlge << '\n';
-            std::cout << "Grzyby   # : " << stats.nFungus << '\n';
-            std::cout << "Bakterie @ : " << stats.nBacteria << '\n';
-            std::cout << "Martwe   + : " << stats.nDead << '\n';
+			OrganismsStatistics stats = m_grid.GetOrganismsStatistics();
+			writeBuffer << "Glony    * : " << stats.nAlge << std::string(paddingSize(stats.nAlge, 14), ' ') << '\n';
+			writeBuffer << "Grzyby   # : " << stats.nFungus << std::string(paddingSize(stats.nFungus, 14), ' ') << '\n';
+			writeBuffer << "Bakterie @ : " << stats.nBacteria << std::string(paddingSize(stats.nBacteria, 14), ' ') << '\n';
+			writeBuffer << "Martwe   + : " << stats.nDead << std::string(paddingSize(stats.nDead, 14), ' ') << '\n';
 
-            if (!(stats.nAlge || stats.nBacteria || stats.nFungus))
-                break;
+			if (!(stats.nAlge || stats.nBacteria || stats.nFungus))
+				break;
 
-            m_grid.Step();
-            std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
-        }
-    }
+			std::cout << writeBuffer.str();
+
+			m_grid.Step();
+			std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
+		}
+	}
 };
 
 int main(int argc, const char *argv[])
 {
-    setlocale(LC_ALL, "pl_PL");
-    Simulation simulation = Simulation((argc > 1) ? argv[1] : std::string());
-    simulation.Run();
+	setlocale(LC_ALL, "pl_PL");
+	Simulation simulation = Simulation((argc > 1) ? argv[1] : std::string());
+	simulation.Run();
 
-    std::cout << "Symulacja się zakończyła ponieważ nie ma w niej żywych organizmów.\n";
+	std::cout << "Symulacja się zakończyła ponieważ nie ma w niej żywych organizmów.\n";
 
-    return 0;
+	return 0;
 }

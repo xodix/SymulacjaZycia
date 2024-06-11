@@ -44,12 +44,12 @@ public:
 		m_array = new T[colLen * rowLen];
 	}
 
-	size_t ColumnLength() const
+	inline size_t ColumnLength() const
 	{
 		return m_colLen;
 	}
 
-	size_t RowLength() const
+	inline size_t RowLength() const
 	{
 		return m_rowLen;
 	}

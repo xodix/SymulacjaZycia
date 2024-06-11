@@ -72,7 +72,7 @@ public:
 		}
 	}
 
-	size_t Length() const
+	inline size_t Length() const
 	{
 		return m_length;
 	}

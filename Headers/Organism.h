@@ -12,120 +12,87 @@
 #define ALGE_REPRODUCTION_COST 2
 #define ALGE_MEAL_LIMIT 6
 
-
 // Fungus predefined settings
 #define FUNGUS_MIN_LIVE_SPAN 40
-#define FUNGUS_MAX_LIVE_SPAN  60
+#define FUNGUS_MAX_LIVE_SPAN 60
 #define FUNGUS_REPRODUCTION_COST 3
 #define FUNGUS_MEAL_LIMIT 30
 
 // Bacteria predefined settings
 #define BACTERIA_MIN_LIVE_SPAN 25
-#define BACTERIA_MAX_LIVE_SPAN  40
+#define BACTERIA_MAX_LIVE_SPAN 40
 #define BACTERIA_REPRODUCTION_COST 3
 #define BACTERIA_MEAL_LIMIT 10
 
-enum class OrganismType {
+enum class OrganismType
+{
     Alge,
     Fungus,
     Bacteria
 };
 
-class Organism {
+class Organism
+{
     size_t m_age = 0;
     size_t m_nMeals = 0;
     bool m_isHungry = true;
     OrganismType m_organismType = OrganismType::Alge;
 
 public:
-    Organism(OrganismType organismType, size_t age) {
+    Organism(OrganismType organismType, size_t age)
+    {
         m_organismType = organismType;
         m_age = age;
     }
 
-    bool isAlive() const {
+    bool IsAlive() const
+    {
         return m_age != 0;
     }
 
-    // Age organism by one step
-    void age() {
-        if (isAlive())
-            m_age--;
-    }
-
-    void increaseMelas() {
-        m_nMeals++;
-
-        if (m_nMeals > getMealLimit()) {
-            m_isHungry = false;
-        }
-    }
-
-    bool isFed() const {
+    bool IsFed() const
+    {
         return !m_isHungry;
     }
 
-    // TODO: Should be static.
-    size_t getMealLimit() const {
-        switch (m_organismType)
-        {
-        case OrganismType::Alge:
-            return ALGE_MEAL_LIMIT;
-            break;
-        case OrganismType::Fungus:
-            return FUNGUS_MEAL_LIMIT;
-            break;
-        case OrganismType::Bacteria:
-            return BACTERIA_MEAL_LIMIT;
-            break;
-        default:
-            throw;
-            break;
-        }
+    bool CanReproduce() const
+    {
+        return m_nMeals >= getReproductionCost(m_organismType);
     }
 
-    size_t getAge() const {
+    size_t GetAge() const
+    {
         return m_age;
     }
 
-    OrganismType getType() const {
+    OrganismType GetType() const
+    {
         return m_organismType;
     }
 
-    bool canReproduce() {
-        switch (m_organismType)
-        {
-        case OrganismType::Alge:
-            return m_nMeals >= ALGE_REPRODUCTION_COST;
-        case OrganismType::Fungus:
-            return m_nMeals >= FUNGUS_REPRODUCTION_COST;
-        case OrganismType::Bacteria:
-            return m_nMeals >= BACTERIA_REPRODUCTION_COST;
-        default:
-            throw;
-            break;
-        }
+    // Age organism by one step
+    void Age()
+    {
+        if (IsAlive())
+            m_age--;
     }
 
-    void reproduce() {
-        switch (m_organismType)
-        {
-        case OrganismType::Alge:
-            m_nMeals -= ALGE_REPRODUCTION_COST;
-            break;
-        case OrganismType::Fungus:
-            m_nMeals -= FUNGUS_REPRODUCTION_COST;
-            break;
-        case OrganismType::Bacteria:
-            m_nMeals -= BACTERIA_REPRODUCTION_COST;
-            break;
-        default:
-            throw;
-            break;
-        }
+    void Feed()
+    {
+        m_nMeals++;
+
+        if (m_nMeals > getMealLimit(m_organismType))
+            m_isHungry = false;
     }
 
-    static size_t getMinAge(OrganismType organismType) {
+    void Reproduce()
+    {
+        m_nMeals -= getReproductionCost(m_organismType);
+    }
+
+private:
+    static size_t getMinAge(OrganismType organismType)
+    {
         switch (organismType)
         {
         case OrganismType::Alge:
@@ -143,7 +110,8 @@ public:
         }
     }
 
-    static size_t getMaxAge(OrganismType organismType) {
+    static size_t getMaxAge(OrganismType organismType)
+    {
         switch (organismType)
         {
         case OrganismType::Alge:
@@ -161,30 +129,78 @@ public:
         }
     }
 
-    static Organism random() {
-        RandomGenerator* generator = RandomGenerator::GetGenerator();
+    static size_t getMealLimit(OrganismType organismType)
+    {
+        switch (organismType)
+        {
+        case OrganismType::Alge:
+            return ALGE_MEAL_LIMIT;
+            break;
+        case OrganismType::Fungus:
+            return FUNGUS_MEAL_LIMIT;
+            break;
+        case OrganismType::Bacteria:
+            return BACTERIA_MEAL_LIMIT;
+            break;
+        default:
+            throw;
+            break;
+        }
+    }
+
+    static size_t getReproductionCost(OrganismType organismType)
+    {
+        switch (organismType)
+        {
+        case OrganismType::Alge:
+            return ALGE_REPRODUCTION_COST;
+        case OrganismType::Fungus:
+            return FUNGUS_REPRODUCTION_COST;
+        case OrganismType::Bacteria:
+            return BACTERIA_REPRODUCTION_COST;
+        default:
+            throw;
+            break;
+        }
+    }
+
+public:
+    static Organism Random(OrganismType organismType)
+    {
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
+        size_t age = generator->GenerateRange(Organism::getMinAge(organismType), Organism::getMaxAge(organismType));
+
+        return Organism(organismType, age);
+    }
+
+    static Organism Random()
+    {
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
         bool isDead = generator->GenerateBoolean();
         OrganismType organismType = (OrganismType)generator->GenerateRange(0, 2);
         size_t age = 0;
 
-        if (!isDead) {
-           age = generator->GenerateRange(Organism::getMinAge(organismType), Organism::getMaxAge(organismType));
+        if (!isDead)
+        {
+            age = generator->GenerateRange(Organism::getMinAge(organismType), Organism::getMaxAge(organismType));
         }
 
         return Organism(organismType, age);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Organism& organism);
+    friend std::ostream &operator<<(std::ostream &os, const Organism &organism);
 };
 
-std::ostream& operator<<(std::ostream& os, const Organism& organism)
+std::ostream &operator<<(std::ostream &os, const Organism &organism)
 {
     char representation = ' ';
 
-    if (!organism.isAlive()) {
+    if (!organism.IsAlive())
+    {
         representation = ORGANISM_DEAD;
     }
-    else {
+    else
+    {
         switch (organism.m_organismType)
         {
         case OrganismType::Alge:
@@ -197,7 +213,7 @@ std::ostream& operator<<(std::ostream& os, const Organism& organism)
             representation = ORGANISM_BACTERIA;
             break;
         default:
-            // unrechable
+            // unreachable
             throw;
         }
     }

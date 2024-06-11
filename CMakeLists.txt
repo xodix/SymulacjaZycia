@@ -15,11 +15,10 @@ else()
 endif()
 
 # MAIN EXECUTABLE
-add_executable(SymulacjaZycia "SymulacjaZycia.cpp" "Headers/RandomGenerator.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Headers/Vicinity.h" "Headers/RandomGenerator.h")
+add_executable(SymulacjaZycia "SymulacjaZycia.cpp" "Headers/RandomGenerator.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Headers/Vicinity.h")
 
 # TESTS
 add_executable(TestRows "Tests/TestRows.cpp" "Headers/RandomGenerator.h" "Headers/Rows.h" "Tests/TestingUtilities.h")
-
 
 add_executable(TestReadWrite "Tests/TestReadWrite.cpp" "Headers/RandomGenerator.h" "Headers/Vicinity.h" "Headers/Rows.h" "Headers/Organism.h" "Headers/Grid.h" "Tests/TestingUtilities.h")
 

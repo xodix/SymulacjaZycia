@@ -29,7 +29,7 @@ public:
 	}
 
 	// Generate a random integer in <from, to> range.
-	int GenerateRange(int from, int to) const
+	size_t GenerateRange(size_t from, size_t to) const
 	{
 		if (from == to)
 			return from;

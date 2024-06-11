@@ -14,12 +14,13 @@
 #include "../Headers/Grid.h"
 #include "TestingUtilities.h"
 
-int TestCreateOrganismStatistics() {
+int TestCreateOrganismStatistics()
+{
 	std::string input = "_+*\n#@*\n++_";
 	std::istringstream is(input);
 	Grid grid = Grid(3, 3);
 	is >> grid;
-	OrganismsStatistics statistics = grid.organismsStatistics();
+	OrganismsStatistics statistics = grid.GetOrganismsStatistics();
 
 	if (statistics.nAlge != 2)
 		return EXIT_FAILURE;
@@ -36,8 +37,9 @@ int TestCreateOrganismStatistics() {
 	return EXIT_SUCCESS;
 }
 
-// As this is a standardised basic_istream and basic_ostream abstractions. I can use the following with both stringstream and fstream.
-int main(int argc, char* argv[]) {
+// As this is a standardized basic_istream and basic_ostream abstractions. I can use the following with both stringstream and fstream.
+int main(int argc, char *argv[])
+{
 	test("Creating Organism Statistics", TestCreateOrganismStatistics);
 
 	return EXIT_SUCCESS;

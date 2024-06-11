@@ -12,7 +12,7 @@ class Row
 public:
 	Row(T *ptr, size_t length) : m_contents(ptr), m_length(length) {}
 
-	T &operator[](size_t index)
+	T &operator[](size_t index) noexcept(false)
 	{
 		if (index >= m_length)
 			throw std::range_error("Item index out of range!");
@@ -54,7 +54,7 @@ public:
 		return m_rowLen;
 	}
 
-	Row<T> operator[](size_t index)
+	Row<T> operator[](size_t index) noexcept(false)
 	{
 		if (index >= m_colLen)
 			throw std::range_error("Column index out of range!");

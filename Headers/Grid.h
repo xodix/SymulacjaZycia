@@ -3,112 +3,112 @@
 #define CELL_EMPTY '_'
 
 // Single cell in a grid.
-class Cell {
+class Cell
+{
     // Can contain Organism (dead or alive) or nullopt (empty) and is stored on the stack.
-    std::optional<Organism> contents = std::nullopt;
+    std::optional<Organism> m_contents = std::nullopt;
 
-
-    void feedAlge(Vicinity<Cell>& readVicinity) {
-        contents.value().increaseMelas();
+    void feedAlge(Vicinity<Cell> &_vicinity)
+    {
+        m_contents.value().Feed();
     }
 
-    void feedFungus(Vicinity<Cell>& readVicinity) {
-        Cell* dead[8]{};
-        size_t n_dead = 0;
+    void feedFungus(Vicinity<Cell> &vicinity)
+    {
+        Cell *dead[8]{};
+        size_t nDead = 0;
 
-        for (size_t i = 0; i < readVicinity.Length(); i++)
+        for (size_t i = 0; i < vicinity.Length(); i++)
         {
-            if (readVicinity[i]->contents.has_value()) {
-                if (!readVicinity[i]->contents.value().isAlive()) {
-                    dead[n_dead++] = readVicinity[i];
+            if (vicinity[i]->m_contents.has_value())
+            {
+                if (!vicinity[i]->m_contents.value().IsAlive())
+                {
+                    dead[nDead++] = vicinity[i];
                 }
             }
         }
 
-        RandomGenerator* generator = RandomGenerator::GetGenerator();
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
 
-        if (n_dead) {
-            size_t n_cell = generator->GenerateRange(0, n_dead - 1);
-            dead[n_cell]->contents = std::nullopt;
-            contents.value().increaseMelas();
+        if (nDead)
+        {
+            size_t randomCell = generator->GenerateRange(0, nDead - 1);
+            dead[randomCell]->m_contents = std::nullopt;
+            m_contents.value().Feed();
         }
     }
 
-    void feedBacteria(Vicinity<Cell>& readVicinity) {
-        Cell* cells[8]{};
-        size_t n_alge = 0;
-        size_t n_bacteria = 0;
+    void feedBacteria(Vicinity<Cell> &vicinity)
+    {
+        Cell *cells[8]{};
+        size_t nAlge = 0;
+        size_t nBacteria = 0;
 
-        for (size_t i = 0; i < readVicinity.Length(); i++)
+        for (size_t i = 0; i < vicinity.Length(); i++)
         {
-            if (readVicinity[i]->contents.has_value()) {
-                Organism& currOrganism = readVicinity[i]->contents.value();
-                switch (currOrganism.getType()) {
+            if (vicinity[i]->m_contents.has_value())
+            {
+                Organism &currOrganism = vicinity[i]->m_contents.value();
+                switch (currOrganism.GetType())
+                {
                 case OrganismType::Alge:
-                    cells[n_alge++] = readVicinity[i];
+                    cells[nAlge++] = vicinity[i];
                     break;
                 case OrganismType::Bacteria:
-                    cells[7 - n_bacteria] = readVicinity[i];
-                    n_bacteria++;
+                    cells[7 - nBacteria] = vicinity[i];
+                    nBacteria++;
                     break;
                 }
             }
         }
 
-        RandomGenerator* generator = RandomGenerator::GetGenerator();
-        if (n_alge) {
-            size_t n_cell = generator->GenerateRange(0, n_alge-1);
-            cells[n_cell]->contents = std::nullopt;
-            contents.value().increaseMelas();
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
+        if (nAlge)
+        {
+            size_t randomCell = generator->GenerateRange(0, nAlge - 1);
+            cells[randomCell]->m_contents = std::nullopt;
+            m_contents.value().Feed();
         }
-        else if (n_bacteria) {
-            size_t n_cell = generator->GenerateRange(8-n_bacteria, 7);
-            cells[n_cell]->contents = std::nullopt;
-            contents.value().increaseMelas();
+        else if (nBacteria)
+        {
+            size_t randomCell = generator->GenerateRange(8 - nBacteria, 7);
+            cells[randomCell]->m_contents = std::nullopt;
+            m_contents.value().Feed();
         }
     }
 
 public:
     Cell() {}
 
-    Cell(Organism organism) : contents(organism) {}
+    Cell(Organism organism) : m_contents(organism) {}
 
-    static Cell random() {
-        RandomGenerator* generator = RandomGenerator::GetGenerator();
-        // Empty cell has equal probability to every other type of cell.
-        bool is_empty = generator->GenerateWeightedBoolean(1, 5);
-
-        if (is_empty)
-            return Cell();
-
-        Organism organism = Organism::random();
-        return Cell(organism);
+    std::optional<Organism> &GetContents()
+    {
+        return m_contents;
     }
 
-    std::optional<Organism>& getContents() {
-        return contents;
-    }
-
-    // TODO
-    void step(Vicinity<Cell> readVicinity) {
-        if (!contents.has_value())
+    void Step(Vicinity<Cell> vicinity)
+    {
+        if (!m_contents.has_value())
             return;
 
-        Organism& organism = contents.value();
-        if (!organism.isAlive())
+        Organism &organism = m_contents.value();
+        if (!organism.IsAlive())
             return;
 
-        if (!organism.isFed()) {
-            switch (organism.getType())
+        if (!organism.IsFed())
+        {
+            switch (organism.GetType())
             {
             case OrganismType::Alge:
-                feedAlge(readVicinity);
+                feedAlge(vicinity);
                 break;
             case OrganismType::Fungus:
-                feedFungus(readVicinity);
+                feedFungus(vicinity);
                 break;
             case OrganismType::Bacteria:
-                feedBacteria(readVicinity);
+                feedBacteria(vicinity);
                 break;
             default:
                 throw;
@@ -116,72 +116,98 @@ public:
             }
         }
 
-        Cell* emptyCells[8];
-        size_t n_empty = 0;
-        for (size_t i = 0; i < readVicinity.Length(); i++)
+        Cell *emptyCells[8]{};
+        size_t nEmpty = 0;
+        for (size_t i = 0; i < vicinity.Length(); i++)
         {
-            if (!readVicinity[i]->contents.has_value()) {
-                emptyCells[n_empty++] = readVicinity[i];
+            if (!vicinity[i]->m_contents.has_value())
+            {
+                emptyCells[nEmpty++] = vicinity[i];
             }
         }
-        RandomGenerator* generator = RandomGenerator::GetGenerator();
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
 
-        // TODO: Implement reproduction system
-        if (n_empty && organism.isFed()) {
-            if (organism.canReproduce()) {
-                emptyCells[generator->GenerateRange(0, n_empty - 1)]->contents = Organism(organism.getType(), generator->GenerateRange(Organism::getMinAge(organism.getType()), Organism::getMaxAge(organism.getType())));
-                organism.reproduce();
+        if (nEmpty && organism.IsFed())
+        {
+            size_t randomCell = generator->GenerateRange(0, nEmpty - 1);
+            // Reproduce
+            if (organism.CanReproduce())
+            {
+                emptyCells[randomCell]->m_contents = Organism::Random(organism.GetType());
+
+                organism.Reproduce();
             }
-            else if (organism.getType() == OrganismType::Fungus || organism.getType() == OrganismType::Bacteria) {
-                emptyCells[generator->GenerateRange(0, n_empty - 1)]->contents = contents.value();
-                contents = std::nullopt;
+
+            // Travel
+            else if (organism.GetType() == OrganismType::Fungus || organism.GetType() == OrganismType::Bacteria)
+            {
+                emptyCells[randomCell]->m_contents = m_contents.value();
+                m_contents = std::nullopt;
             }
         }
 
-        organism.age();
+        organism.Age();
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Cell& cell);
-    friend std::istream& operator>>(std::istream& os, Cell& cell);
+    static Cell Random()
+    {
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
+        // Empty cell has equal probability to every other type of cell.
+        bool is_empty = generator->GenerateWeightedBoolean(1, 5);
+
+        if (is_empty)
+            return Cell();
+
+        Organism organism = Organism::Random();
+        return Cell(organism);
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const Cell &cell);
+    friend std::istream &operator>>(std::istream &os, Cell &cell);
 };
 
-std::ostream& operator<<(std::ostream& os, const Cell& cell) {
-    if (cell.contents.has_value()) {
-        os << cell.contents.value();
+std::ostream &operator<<(std::ostream &os, const Cell &cell)
+{
+    if (cell.m_contents.has_value())
+    {
+        os << cell.m_contents.value();
     }
-    else {
+    else
+    {
         os << CELL_EMPTY;
     }
 
     return os;
 }
 
-std::istream& operator>>(std::istream& stream, Cell& cell)
+std::istream &operator>>(std::istream &stream, Cell &cell)
 {
     char cellRepresentation = CELL_EMPTY;
     stream >> cellRepresentation;
 
-    if (cellRepresentation == CELL_EMPTY) {
-        cell.contents = std::nullopt;
+    if (cellRepresentation == CELL_EMPTY)
+    {
+        cell.m_contents = std::nullopt;
     }
-    else {
-        RandomGenerator* generator = RandomGenerator::GetGenerator();
+    else
+    {
+        RandomGenerator *generator = RandomGenerator::GetGenerator();
         switch (cellRepresentation)
         {
-            case ORGANISM_DEAD:
-                cell.contents = Organism(OrganismType::Alge, 0);
-                break;
-            case ORGANISM_ALGE:
-                cell.contents = Organism(OrganismType::Alge, generator->GenerateRange(Organism::getMinAge(OrganismType::Alge), Organism::getMaxAge(OrganismType::Alge)));
-                break;
-            case ORGANISM_FUNGUS:
-                cell.contents = Organism(OrganismType::Fungus, generator->GenerateRange(Organism::getMinAge(OrganismType::Fungus), Organism::getMaxAge(OrganismType::Fungus)));
-                break;
-            case ORGANISM_BACTERIA:
-                cell.contents = Organism(OrganismType::Bacteria, generator->GenerateRange(Organism::getMinAge(OrganismType::Bacteria), Organism::getMaxAge(OrganismType::Bacteria)));
-                break;
+        case ORGANISM_DEAD:
+            cell.m_contents = Organism(OrganismType::Alge, 0);
+            break;
+        case ORGANISM_ALGE:
+            cell.m_contents = Organism::Random(OrganismType::Alge);
+            break;
+        case ORGANISM_FUNGUS:
+            cell.m_contents = Organism::Random(OrganismType::Fungus);
+            break;
+        case ORGANISM_BACTERIA:
+            cell.m_contents = Organism::Random(OrganismType::Bacteria);
+            break;
         default:
-            // unrechable
+            // unreachable
             throw;
         }
     }
@@ -189,109 +215,121 @@ std::istream& operator>>(std::istream& stream, Cell& cell)
     return stream;
 }
 
-struct OrganismsStatistics {
+struct OrganismsStatistics
+{
     size_t nAlge = 0;
     size_t nFungus = 0;
     size_t nBacteria = 0;
     size_t nDead = 0;
 };
 
-class Grid {
-    Rows<Cell> m_readBuffer;
+class Grid
+{
+    Rows<Cell> m_cells;
 
 public:
+    Grid(size_t colLen, size_t rowLen) : m_cells(colLen, rowLen) {}
 
-    Grid(size_t colLen, size_t rowLen) : m_readBuffer(colLen, rowLen) {}
-
-    void fillFile(std::ifstream& file) {
-        for (size_t i = 0; i < m_readBuffer.ColumnLength(); i++) {
-            for (size_t j = 0; j < m_readBuffer.RowLength(); j++) {
-                file >> m_readBuffer[i][j];
+    void FillFile(std::ifstream &file)
+    {
+        for (size_t i = 0; i < m_cells.ColumnLength(); i++)
+        {
+            for (size_t j = 0; j < m_cells.RowLength(); j++)
+            {
+                file >> m_cells[i][j];
             }
         }
     }
 
-    void fillRandom() {
-        for (size_t i = 0; i < m_readBuffer.ColumnLength(); i++)
-            for (size_t j = 0; j < m_readBuffer.RowLength(); j++) {
-                //m_readBuffer[i][j] = Cell();
-                m_readBuffer[i][j] = Cell::random();
+    void FillRandom()
+    {
+        for (size_t i = 0; i < m_cells.ColumnLength(); i++)
+            for (size_t j = 0; j < m_cells.RowLength(); j++)
+            {
+                m_cells[i][j] = Cell::Random();
             }
     }
 
-    void step() {
-        for (size_t i = 0; i < m_readBuffer.ColumnLength(); i++) {
-            for (size_t j = 0; j < m_readBuffer.RowLength(); j++) {
-                Cell& currCell = m_readBuffer[i][j];
-                auto vicinity = Vicinity<Cell>(m_readBuffer, i, j);
-                currCell.step(vicinity);
+    void Step()
+    {
+        for (size_t i = 0; i < m_cells.ColumnLength(); i++)
+        {
+            for (size_t j = 0; j < m_cells.RowLength(); j++)
+            {
+                Cell &currCell = m_cells[i][j];
+                auto vicinity = Vicinity<Cell>(m_cells, i, j);
+                currCell.Step(vicinity);
             }
         }
     }
 
-    OrganismsStatistics organismsStatistics() {
-        OrganismsStatistics organisms_statistics = OrganismsStatistics();
-        organisms_statistics.nAlge = 0;
-        organisms_statistics.nBacteria = 0;
-        organisms_statistics.nDead = 0;
-        organisms_statistics.nFungus = 0;
+    OrganismsStatistics GetOrganismsStatistics()
+    {
+        OrganismsStatistics organismsStatistics = OrganismsStatistics();
 
-        for (size_t i = 0; i < m_readBuffer.ColumnLength(); i++) {
-            for (size_t j = 0; j < m_readBuffer.RowLength(); j++) {
-                std::optional<Organism>& currCell = m_readBuffer[i][j].getContents();
-                if (currCell.has_value()) {
-                    Organism& organism = currCell.value();
-                    if (!organism.isAlive()) {
-                        organisms_statistics.nDead++;
+        for (size_t i = 0; i < m_cells.ColumnLength(); i++)
+        {
+            for (size_t j = 0; j < m_cells.RowLength(); j++)
+            {
+                std::optional<Organism> &currCell = m_cells[i][j].GetContents();
+                if (currCell.has_value())
+                {
+                    Organism &organism = currCell.value();
+                    if (!organism.IsAlive())
+                    {
+                        organismsStatistics.nDead++;
                         continue;
                     }
 
-                    switch (organism.getType())
+                    switch (organism.GetType())
                     {
-                        case OrganismType::Alge:
-                            organisms_statistics.nAlge++;
-                            break;
+                    case OrganismType::Alge:
+                        organismsStatistics.nAlge++;
+                        break;
 
-                        case OrganismType::Fungus:
-                            organisms_statistics.nFungus++;
-                            break;
+                    case OrganismType::Fungus:
+                        organismsStatistics.nFungus++;
+                        break;
 
-                        case OrganismType::Bacteria:
-                            organisms_statistics.nBacteria++;
-                            break;
+                    case OrganismType::Bacteria:
+                        organismsStatistics.nBacteria++;
+                        break;
 
-                        default:
-                            throw;
-                            break;
+                    default:
+                        throw;
+                        break;
                     }
                 }
-                
             }
         }
 
-        return organisms_statistics;
+        return organismsStatistics;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, Grid& grid);
-    friend std::istream& operator>>(std::istream& stream, Grid& grid);
+    friend std::ostream &operator<<(std::ostream &os, Grid &grid);
+    friend std::istream &operator>>(std::istream &stream, Grid &grid);
 };
 
-std::ostream& operator<<(std::ostream& os, Grid& grid) {
-    for (size_t i = 0; i < grid.m_readBuffer.ColumnLength(); i++) {
-        for (size_t j = 0; j < grid.m_readBuffer.RowLength(); j++) {
-            os << grid.m_readBuffer[i][j];
-        }
+std::ostream &operator<<(std::ostream &os, Grid &grid)
+{
+    for (size_t i = 0; i < grid.m_cells.ColumnLength(); i++)
+    {
+        for (size_t j = 0; j < grid.m_cells.RowLength(); j++)
+            os << grid.m_cells[i][j];
+
         os << '\n';
     }
 
     return os;
 }
 
-std::istream& operator>>(std::istream& stream, Grid& grid)
+std::istream &operator>>(std::istream &stream, Grid &grid)
 {
-    for (size_t i = 0; i < grid.m_readBuffer.ColumnLength(); i++) {
-        for (size_t j = 0; j < grid.m_readBuffer.RowLength(); j++) {
-            stream >> grid.m_readBuffer[i][j];
+    for (size_t i = 0; i < grid.m_cells.ColumnLength(); i++)
+    {
+        for (size_t j = 0; j < grid.m_cells.RowLength(); j++)
+        {
+            stream >> grid.m_cells[i][j];
         }
     }
 

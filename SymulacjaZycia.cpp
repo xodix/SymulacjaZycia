@@ -18,63 +18,65 @@ constexpr std::chrono::milliseconds SIMULATION_STEP_TIMEOUT(1000);
 class Simulation
 {
 protected:
-	Grid m_grid;
-	std::filesystem::path m_filePath;
-	size_t m_currStep = 0;
+    Grid m_grid;
+    std::filesystem::path m_filePath;
+    size_t m_currStep = 0;
 
 public:
-	Simulation(std::string filePath) : m_grid(N_ROWS, N_COLS), m_filePath(filePath)
-	{
-		if (!filePath.empty())
-		{
-			std::ifstream file(filePath);
-			if (!file.is_open())
-			{
-				throw std::runtime_error("Grid file not found!");
-			}
+    Simulation(std::string filePath) : m_grid(N_ROWS, N_COLS), m_filePath(filePath)
+    {
+        if (!filePath.empty())
+        {
+            std::ifstream file(filePath);
+            if (!file.is_open())
+                throw std::runtime_error("Nie można otworzyć pliku z konfiguracją początkową!");
 
-			m_grid.fillFile(file);
-		}
-		else
-		{
-			m_grid.fillRandom();
-		}
-	}
+            m_grid.FillFile(file);
+        }
+        else
+        {
+            m_grid.FillRandom();
+        }
+    }
 
-	// TODO: replace this with writing into raw terminal context
-	void Run()
-	{
-		while (true)
-		{
-			m_currStep++;
+    // TODO: replace this with writing into raw terminal context
+    void Run()
+    {
+        while (true)
+        {
+            m_currStep++;
 
 #if _WIN32
-			system("cls");
+            system("cls");
 #else
-			system("clear");
+            system("clear");
 #endif
 
-			std::cout << "Krok symulacji: " << m_currStep << '\n';
-			std::cout << m_grid;
+            std::cout << "Krok symulacji: " << m_currStep << '\n';
+            std::cout << m_grid;
 
-			// Improved speed O(4n) -> O(n). While preserving separation of concerns.
-			OrganismsStatistics stats = m_grid.organismsStatistics();
-			std::cout << "Glony    * : " << stats.nAlge << '\n';
-			std::cout << "Grzyby   # : " << stats.nFungus << '\n';
-			std::cout << "Bakterie @ : " << stats.nBacteria << '\n';
-			std::cout << "Martwe   + : " << stats.nDead << '\n';
+            OrganismsStatistics stats = m_grid.GetOrganismsStatistics();
+            std::cout << "Glony    * : " << stats.nAlge << '\n';
+            std::cout << "Grzyby   # : " << stats.nFungus << '\n';
+            std::cout << "Bakterie @ : " << stats.nBacteria << '\n';
+            std::cout << "Martwe   + : " << stats.nDead << '\n';
 
-			m_grid.step();
-			std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
-		}
-	}
+            if (!(stats.nAlge || stats.nBacteria || stats.nFungus))
+                break;
+
+            m_grid.Step();
+            std::this_thread::sleep_for(SIMULATION_STEP_TIMEOUT);
+        }
+    }
 };
 
 int main(int argc, const char *argv[])
 {
-	Simulation simulation = Simulation((argc > 1) ? argv[1] : std::string());
-	simulation.Run();
-	std::cout << "Symulacja się zakończyła ponieważ nie ma w niej żywych organizmów.\n";
+    setlocale(LC_ALL, "pl_PL");
+    Simulation simulation = Simulation((argc > 1) ? argv[1] : std::string());
+    simulation.Run();
 
-	return 0;
+    std::cout << "Symulacja się zakończyła ponieważ nie ma w niej żywych organizmów.\n";
+
+    return 0;
 }

@@ -3,11 +3,10 @@
 ## Budowa projektu
 
 ```sh
+	mkdir symulacjazycia
 	cd symulacjazycia
-	mkdir build
-	cd build
-	cmake ..
-	make
+	cmake -DCMAKE_BUILD_TYPE=Release ..
+	cmake --build .
 ```
 
 ## Wykonywanie testów (po budowie)
@@ -36,8 +35,6 @@
 
 #### plik: Rows.h
 
-#### wymagania: Row<T>
-
 Własna implementacja tablicy "dwuwymiarowej".
 
 Rows<T> przechowuje dane w tablicy jednowymiarowej
@@ -59,22 +56,20 @@ Aby uzyskać wartość `T` należy ponownie użyć operatora[]
 
 #### plik: Vicinity.h
 
-#### wymagania: Rows<T>
-
-Sąsiedztwo pobiera położenie niszy otaczające wskazaną niszę.
+Sąsiedztwo pobiera nisze otaczające wskazaną niszę.
 
 Klasa zwraca szczególną uwagę aby nie pobrać informacji nie należącej do
 instancji `Rows<T>`.
 
-Próba dostępu do pozycji spoza Rows<T> skutkuje w `std::rangeError`.
-Algorytm tworzenie sąsiedztwa jest zbytecznie skomplikowany, ale nie mogłem wymyślić lepszego.
+Próba dostępu do pozycji spoza `Rows<T>` skutkuje w `std::range_error`.
 
 ### std::optional<T>
 
-#### plik: <optional>
+#### plik: \<optional\>
 
 Klasa optional może zawierać T lub std::nullopt.
 Używana jest w `Cell` ponieważ jej konstrukcja nie wymaga kolejnej alokacji na stercie.
+Dodatkowo lepiej wskazuje intencję parametru m_contents niż wskaźnik.
 
 ## Klasy
 
@@ -83,23 +78,20 @@ Używana jest w `Cell` ponieważ jej konstrukcja nie wymaga kolejnej alokacji na
 #### plik: RandomGenerator.h
 
 Generator to klasa singelton, która posiada tylko i wyłącznie jedną instancję
-klasy std::random_device jako parametr. `RandomGenerator` eksponuje funkcje związane z
+klasy `std::random_device` jako parametr. `RandomGenerator` eksponuje funkcje związane z
 generacją funkcji losowych.
 
 ### Simulation - Symulacja
 
 #### plik: SymulacjaZycia.cpp
 
-#### wymagania: Grid
-
 Symulacja zawiera `Grid` i zarządza działaniem symulacji.
 Szczególnie rozpoczęciem i zakończeniem symulacji.
+Dodatkowo przekazuje stan ekosystemu użytkownikowi programu.
 
 ### Grid - Siatka
 
 #### plik: Grid.h
-
-#### wymagania: Rows<T>, Cell
 
 Siatka zawiera tablicę dwuwymiarowa `Rows`, która zawiera instancje `Cell`.
 Siatka przekazuje do `Cell` jej `Vicinity`.
@@ -108,15 +100,14 @@ Siatka przekazuje do `Cell` jej `Vicinity`.
 
 #### plik: Grid.h
 
-#### wymagania: Organism, std::optional
-
-Nisza zawiera `Organism` lub nic(std::nullopt_t).
-Nisza jest główną klasą która w pełni zarządza `Organism`.
+Nisza zawiera `Organism` lub nic(`std::nullopt_t`).
+Nisza jest główną klasą która w pełni zarządza jej instancją `Organism`.
 Na podstawie podanego `Vicinity` `Cell` wykonuje krok symulacji.
 
 ### Organism - Organizm
 
-#### plik: Organism.h
-
 Organizm to klasa, która zawiera dane organizmu
 i eksponuje je w sposób przystosowany do działania Symulacji.
+Modyfikacja i przeglądanie danych organizmu jest ograniczone
+za pomocą funkcji getter i setter np. organizm może zostać postarzony
+o tylko jeden krok symulacji i nakarmiony tylko jednym pokarmem.

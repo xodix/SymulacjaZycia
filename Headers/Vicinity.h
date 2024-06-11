@@ -29,7 +29,7 @@ class Vicinity
 		return j == cells.RowLength() - 1;
 	}
 
-	// Add a selected row without cousing std::randge_exception
+	// Add a selected row without causing std::range_exception
 	void addRow(Rows<T> &cells, size_t row_index, size_t i, size_t j) noexcept
 	{
 		if (row_index != i)

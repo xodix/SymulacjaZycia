@@ -23,10 +23,12 @@ protected:
 	std::filesystem::path m_filePath;
 	size_t m_currStep = 0;
 
-	size_t paddingSize(size_t numberShowed, size_t messageLength)
-	{
-		int padding = N_COLS - log10(numberShowed) - messageLength;
-		return (size_t)(padding > 0 ? padding : 0);
+	inline void clearScreen() {
+#if _WIN32
+			system("cls");
+#else
+			system("clear");
+#endif
 	}
 
 public:
@@ -48,24 +50,24 @@ public:
 
 	void Run()
 	{
+		clearScreen();
+
 		while (true)
 		{
 			std::stringstream writeBuffer;
 			m_currStep++;
 
-			// Write over last buffer (ASCII escape codes)
-			// Super fast but breaks when terminal window is not sized correctly
-			writeBuffer << (char)27 << "[H";
+			// ANSI sequences work differently on different TERMINALS. Using slow solution instead.
+			clearScreen();
 
-			// Almost fixes the problem
-			writeBuffer << "Krok symulacji: " << m_currStep << std::string(paddingSize(m_currStep, 17), ' ') << '\n';
+			writeBuffer << "Krok symulacji: " << m_currStep << '\n';
 			writeBuffer << m_grid;
 
 			OrganismsStatistics stats = m_grid.GetOrganismsStatistics();
-			writeBuffer << "Glony    * : " << stats.nAlge << std::string(paddingSize(stats.nAlge, 14), ' ') << '\n';
-			writeBuffer << "Grzyby   # : " << stats.nFungus << std::string(paddingSize(stats.nFungus, 14), ' ') << '\n';
-			writeBuffer << "Bakterie @ : " << stats.nBacteria << std::string(paddingSize(stats.nBacteria, 14), ' ') << '\n';
-			writeBuffer << "Martwe   + : " << stats.nDead << std::string(paddingSize(stats.nDead, 14), ' ') << '\n';
+			writeBuffer << "Glony    * : " << stats.nAlge << '\n';
+			writeBuffer << "Grzyby   # : " << stats.nFungus << '\n';
+			writeBuffer << "Bakterie @ : " << stats.nBacteria << '\n';
+			writeBuffer << "Martwe   + : " << stats.nDead << '\n';
 
 			if (!(stats.nAlge || stats.nBacteria || stats.nFungus))
 				break;
